@@ -1,17 +1,22 @@
 package com.znq.freedom.controller;
 
-import com.znq.freedom.model.R;
-import com.znq.freedom.model.TableClass;
-import com.znq.freedom.service.GenerateCodeService;
-import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.znq.freedom.model.TableClass;
+import com.znq.freedom.service.GenerateCodeService;
+import com.znq.freedom.utils.Result;
 
 /**
  * @Author znq
  * @create 2022/9/20 21:46
+ * 文件生成
  */
 @RestController
 public class GenerateCodeController {
@@ -28,7 +33,7 @@ public class GenerateCodeController {
 
     // 生成到绝对路径当中
     @PostMapping("/generateCode/{path}")
-    public R generateCode(@RequestBody List<TableClass> tableClassList, @PathVariable String path) {
+    public Result generateCode(@RequestBody List<TableClass> tableClassList, @PathVariable String path) {
         return generateCodeService.generateCode(tableClassList, path.replace('-', '\\'));
     }
 

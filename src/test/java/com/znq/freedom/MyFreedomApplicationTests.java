@@ -1,63 +1,109 @@
 package com.znq.freedom;
 
-import com.znq.freedom.model.TableClass;
-import com.znq.freedom.utils.DBUtils;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
-import java.sql.*;
+import com.znq.freedom.model.DataBase;
+import com.znq.freedom.model.GlobalConfig;
+import com.znq.freedom.model.TableClass;
+import com.znq.freedom.service.ConfigService;
+import com.znq.freedom.service.GenerateCodeService;
+import com.znq.freedom.utils.Result;
+
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.FileTemplateLoader;
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
+@Slf4j
 class MyFreedomApplicationTests {
 
+    @Resource
+    private ConfigService configService;
 
+    @Resource
+    private GenerateCodeService generateCodeService;
 
     @Test
-    void contextLoads() throws SQLException, ClassNotFoundException {
-        // 获取数据库连接
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/mybatis?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai",
-                "root",
-                "@ZNQRoot123456"
-        );
-        // 获取数据库详细信息
-        DatabaseMetaData metaData = connection.getMetaData();
-        // 通过表名获取表中的字段
-        ResultSet columns = metaData.getColumns(connection.getCatalog(), null, "users", null);
-        // 根据表名获取表中的主键
-        ResultSet primaryKeys = metaData.getPrimaryKeys(null, null, "users");
-        // while (primaryKeys.next()) {
-        //     System.out.println(primaryKeys.getString("COLUMN_NAME"));
-        // }
-        while (columns.next()) {
-            String column_name = columns.getString("COLUMN_NAME");
-            while (primaryKeys.next()) {
-                System.out.println("进来了");
-                String pkName = primaryKeys.getString("COLUMN_NAME");
-                if (column_name.equals(pkName)) {
-                    System.out.println("找到了！！！！！" +  column_name);
-                }
-            }
-            primaryKeys.first();
+    void contextLoads() {
+        DataBase dataBase = new DataBase();        
+        dataBase.setUrl("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
+        dataBase.setUsername("root");
+        dataBase.setPassword("@ZNQRoot123456");
+
+        GlobalConfig globalConfig = new GlobalConfig();
+        globalConfig.setPackageName("com.znq.test");
+        globalConfig.setTablePrefix(null);
+        globalConfig.setTableSuffix(null);
+        globalConfig.setTemplatesType(null);
+
+        ArrayList<TableClass> config = configService.config(globalConfig, dataBase);
+
+        Result generateCode = generateCodeService.generateCode(config, "D:/allproject/base/test");
+        System.out.println(generateCode);
+
+
+    }
+
+    @Test
+    void ftlTest() {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
+        try {
+            cfg.setTemplateLoader(
+                new FileTemplateLoader(
+                    new File(
+                        "D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/"
+                    )
+                ));
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
-        // ResultSet rs = null;
-        // try {
-        //     DatabaseMetaData dbmd = conn.getMetaData();
-        //     rs = dbmd.getPrimaryKeys(null, null, "users");
-        //     while (rs.next()) {
-        //         String tableCat = rs.getString("TABLE_CAT");  //表类别(可为null)
-        //         String tableSchemaName = rs.getString("TABLE_SCHEM");//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
-        //         String tableName = rs.getString("TABLE_NAME");  //表名
-        //         String columnName = rs.getString("COLUMN_NAME");//列名
-        //         short keySeq = rs.getShort("KEY_SEQ");//序列号(主键内值1表示第一列的主键，值2代表主键内的第二列)
-        //         String pkName = rs.getString("PK_NAME"); //主键名称
-        //         System.out.println(tableCat + " - " + tableSchemaName + " - " + tableName + " - " + columnName + " - " + keySeq + " - " + pkName);
-        //     }
-        // } catch (SQLException e) {
-        //     e.printStackTrace();
-        // }
+        cfg.setDefaultEncoding("UTF-8");
+        try {
+            Template template = cfg.getTemplate("test1.java.ftl");
+            this.generate(template);
+        } catch (TemplateNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MalformedTemplateNameException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (TemplateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void generate(Template template)
+            throws IOException, TemplateException {
+        FileOutputStream fos = new FileOutputStream("D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/g/test.txt");
+        OutputStreamWriter out = new OutputStreamWriter(fos);
+        // 使用所提供的数据模型执行模板，并将生成的输出写入所提供的 Writer。
+        template.process(null, out);
+        fos.close();
+        out.close();
     }
 
 }

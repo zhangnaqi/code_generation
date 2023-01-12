@@ -1,6 +1,6 @@
 package ${packageName}.service.impl;
 
-import ${packageName}.pojo.${pojoName};
+import ${packageName}.entity.${entityName};
 import ${packageName}.mapper.${mapperName};
 import ${packageName}.service.${serviceName};
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 
 @Service
 @Slf4j
-public class ${serviceName}Impl extends ServiceImpl<${mapperName}, ${pojoName}>
+public class ${serviceName}Impl extends ServiceImpl<${mapperName}, ${entityName}>
     implements ${serviceName} {
 
     @Resource

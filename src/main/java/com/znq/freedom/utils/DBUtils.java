@@ -28,9 +28,20 @@ public class DBUtils {
             } catch (ClassNotFoundException | SQLException e) {
                 log.info("数据库连接失败 ===>");
                 e.printStackTrace();
+                throw new RuntimeException("数据库连接失败");
             }
         }
         return connection;
+    }
+
+    public static void close() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            log.info("数据库关闭失败 ===> ");
+            e.printStackTrace();
+            throw new RuntimeException("数据库关闭失败");
+        }
     }
 
 }

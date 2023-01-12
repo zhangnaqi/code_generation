@@ -1,0 +1,1 @@
+<#list ['a', 'b', 'c'] as i> ${i}<#sep>,</#sep></#list>

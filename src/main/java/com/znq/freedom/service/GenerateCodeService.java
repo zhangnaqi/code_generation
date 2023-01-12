@@ -1,17 +1,5 @@
 package com.znq.freedom.service;
 
-import com.google.common.base.CaseFormat;
-import com.znq.freedom.model.ColumnClass;
-import com.znq.freedom.model.R;
-import com.znq.freedom.model.TableClass;
-import com.znq.freedom.utils.DBUtils;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,7 +9,22 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import com.google.common.base.CaseFormat;
+import com.znq.freedom.model.ColumnClass;
+import com.znq.freedom.model.StaticInfo;
+import com.znq.freedom.model.TableClass;
+import com.znq.freedom.utils.DBUtils;
+import com.znq.freedom.utils.ObjMapUtils;
+import com.znq.freedom.utils.Result;
+
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * @Author znq
@@ -32,27 +35,30 @@ public class GenerateCodeService {
 
     Configuration cfg = null;
 
-    {
-        cfg = new Configuration(Configuration.VERSION_2_3_30);
-        cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class, "/templates"));
-        cfg.setDefaultEncoding("UTF-8");
-    }
-
     /**
      * 生成模板
+     * 
      * @param tableClassList 表的信息
-     * @param realPath 相对路径
+     * @param realPath       相对路径
      * @return
      */
-    public R generateCode(List<TableClass> tableClassList, String realPath) {
+    public Result generateCode(List<TableClass> tableClassList, String realPath) {
         try {
+
+            cfg = new Configuration(Configuration.VERSION_2_3_30);
+            cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class,
+                    "/templates/mybatisPlusFtl"));
+            cfg.setDefaultEncoding("UTF-8");
+
             // 获取模板
-            Template pojoTemplate = cfg.getTemplate("PojoMybatisPlus.java.ftl");
+            Template entityTemplate = cfg.getTemplate("EntityMybatisPlus.java.ftl");
             Template mapperJavaTemplate = cfg.getTemplate("MapperMybatisPlus.java.ftl");
             Template mapperXmlTemplate = cfg.getTemplate("MapperMybatisPlus.xml.ftl");
             Template serviceTemplate = cfg.getTemplate("ServiceMybatisPlus.java.ftl");
             Template serviceImplTemplate = cfg.getTemplate("ServiceImplMybatisPlus.java.ftl");
             Template controllerTemplate = cfg.getTemplate("ControllerMybatisPlus.java.ftl");
+            Template voTemplate = cfg.getTemplate("Vo.java.ftl");
+            Template dtoTemplate = cfg.getTemplate("Dto.java.ftl");
             // 获取数据库连接
             Connection connection = DBUtils.getConnection();
             // 获取数据库详细信息
@@ -62,7 +68,8 @@ public class GenerateCodeService {
                 // 通过表名获取表中的字段
                 ResultSet columns = metaData.getColumns(connection.getCatalog(), null, tableClass.getTableName(), null);
                 // 根据表名获取表中的主键
-                ResultSet primaryKeys = metaData.getPrimaryKeys(connection.getCatalog(), null, tableClass.getTableName());
+                ResultSet primaryKeys = metaData.getPrimaryKeys(connection.getCatalog(), null,
+                        tableClass.getTableName());
                 List<ColumnClass> columnClassList = new ArrayList<>();
                 // 循环表中的字段
                 while (columns.next()) {
@@ -78,48 +85,64 @@ public class GenerateCodeService {
                     columnClass.setColumnName(column_name);
                     columnClass.setType(type_name);
                     // 处理前缀和后缀
-                    if (tableClass.getColumnsPrefix() == null) tableClass.setColumnsPrefix("");
-                    if (tableClass.getColumnsSuffix() == null) tableClass.setColumnsSuffix("");
+                    if (tableClass.getColumnsPrefix() == null)
+                        tableClass.setColumnsPrefix("");
+                    if (tableClass.getColumnsSuffix() == null)
+                        tableClass.setColumnsSuffix("");
                     String newColumnName = column_name.replace(tableClass.getColumnsPrefix(), "")
                             .replace(tableClass.getColumnsSuffix(), "");
-                    columnClass.setPropertyName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, newColumnName));
+                    columnClass.setPropertyName(CaseFormat.LOWER_UNDERSCORE
+                            .to(CaseFormat.UPPER_CAMEL, newColumnName));
                     while (primaryKeys.next()) {
                         String pkName = primaryKeys.getString("COLUMN_NAME");
-                        if (column_name.equals(pkName)) {
-                            columnClass.setIsPrimary(true);
-                            System.out.println(column_name);
-                        }
+                        if (column_name.equals(pkName)) columnClass.setIsPrimary(true);
+                        else columnClass.setIsPrimary(false);
                     }
                     primaryKeys.first();
                     columnClassList.add(columnClass);
                 }
                 tableClass.setColumns(columnClassList);
-                String path = realPath + "/" + tableClass.getPackageName().replace(".", "/");
-                generate(pojoTemplate, tableClass, path + "/pojo/");
-                generate(mapperJavaTemplate, tableClass, path + "/mapper/");
-                generate(mapperXmlTemplate, tableClass, path + "/mapper/mapper");
-                generate(serviceImplTemplate, tableClass, path + "/service/impl/");
-                generate(serviceTemplate, tableClass, path + "/service/");
-                generate(controllerTemplate, tableClass, path + "/controller/");
+                String path = new StringBuffer()
+                        .append(realPath)
+                        .append("/")
+                        .append(StaticInfo.GLOBAL_CONFIG.getPackageName()
+                                .replace(".", "/"))
+                        .toString();
+                // 数据
+                Map<String, Object> convertObjToMap = ObjMapUtils.convertObjToMap(tableClass);
+                convertObjToMap.put("packageName", StaticInfo.GLOBAL_CONFIG.getPackageName());
+                // 根据模板生成文件
+                generate(entityTemplate, convertObjToMap, path + "/entity/");
+                generate(mapperJavaTemplate, convertObjToMap, path + "/mapper/");
+                generate(mapperXmlTemplate, convertObjToMap, path + "/mapper/mapper");
+                generate(serviceImplTemplate, convertObjToMap, path + "/service/impl/");
+                generate(serviceTemplate, convertObjToMap, path + "/service/");
+                generate(controllerTemplate, convertObjToMap, path + "/controller/");
+                // generate(voTemplate, convertObjToMap, path + "/entity/vo/");
+                // generate(dtoTemplate, convertObjToMap, path + "/entity/dto/");
             }
-            return R.ok("代码已生成", realPath);
+            return Result.success("代码已生成", realPath);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("代码生成失败");
         }
-        return R.error("代码生成失败");
     }
 
     // 输出最终代码 生成文件
-    private void generate(Template template, TableClass tableClass, String path) throws IOException, TemplateException {
+    private void generate(Template template, Map<String, Object> map, String path)
+            throws IOException, TemplateException {
         File folder = new File(path);
-        if (!folder.exists()) {
+        if (!folder.exists())
             folder.mkdirs();
-        }
-        String fileName = path + "/" + tableClass.getPojoName() + template.getName().replace("MybatisPlus", "").replace(".ftl", "").replace("Pojo", "");
+        String fileName = path + "/" + map.get("entityName")
+                + template.getName()
+                        .replace("MybatisPlus", "")
+                        .replace(".ftl", "")
+                        .replace("Entity", "");
         FileOutputStream fos = new FileOutputStream(fileName);
         OutputStreamWriter out = new OutputStreamWriter(fos);
         // 使用所提供的数据模型执行模板，并将生成的输出写入所提供的 Writer。
-        template.process(tableClass,out);
+        template.process(map, out);
         fos.close();
         out.close();
     }
