@@ -25,6 +25,7 @@ public class DBUtils {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(db.getUrl(), db.getUsername(), db.getPassword());
+                log.info("数据库连接建立成功 ===>");
             } catch (ClassNotFoundException | SQLException e) {
                 log.info("数据库连接失败 ===>");
                 e.printStackTrace();
@@ -37,10 +38,15 @@ public class DBUtils {
     public static void close() {
         try {
             connection.close();
+            connection = null;
         } catch (SQLException e) {
             log.info("数据库关闭失败 ===> ");
             e.printStackTrace();
             throw new RuntimeException("数据库关闭失败");
+        } catch (NullPointerException e) {
+            log.info("无数据库连接 ===> e");
+            // e.printStackTrace();
+            throw new RuntimeException("未有数据库连接");
         }
     }
 

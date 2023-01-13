@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @Author znq
  * @create 2022/9/20 16:02
- * 数据库连接，以及数据库表的设置
+ *         数据库连接，以及数据库表的设置
  */
 @RestController
 @RequestMapping("/db")
@@ -32,6 +32,13 @@ public class DBController {
             return Result.success("数据库连接成功", null);
         }
         throw new RuntimeException("数据库连接失败");
+    }
+
+    // 关闭数据库连接
+    @PostMapping("/close")
+    public Result<?> closeDB() {
+        DBUtils.close();
+        return Result.success(null);
     }
 
 }

@@ -39,10 +39,15 @@ class MyFreedomApplicationTests {
     @Resource
     private GenerateCodeService generateCodeService;
 
+    // jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    // root
+    // @ZNQRoot123456
+
     @Test
     void contextLoads() {
-        DataBase dataBase = new DataBase();        
-        dataBase.setUrl("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
+        DataBase dataBase = new DataBase();
+        dataBase.setUrl(
+                "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
         dataBase.setUsername("root");
         dataBase.setPassword("@ZNQRoot123456");
 
@@ -57,7 +62,6 @@ class MyFreedomApplicationTests {
         Result generateCode = generateCodeService.generateCode(config, "D:/allproject/base/test");
         System.out.println(generateCode);
 
-
     }
 
     @Test
@@ -65,11 +69,9 @@ class MyFreedomApplicationTests {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
         try {
             cfg.setTemplateLoader(
-                new FileTemplateLoader(
-                    new File(
-                        "D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/"
-                    )
-                ));
+                    new FileTemplateLoader(
+                            new File(
+                                    "D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/")));
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -98,7 +100,8 @@ class MyFreedomApplicationTests {
 
     private void generate(Template template)
             throws IOException, TemplateException {
-        FileOutputStream fos = new FileOutputStream("D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/g/test.txt");
+        FileOutputStream fos = new FileOutputStream(
+                "D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/g/test.txt");
         OutputStreamWriter out = new OutputStreamWriter(fos);
         // 使用所提供的数据模型执行模板，并将生成的输出写入所提供的 Writer。
         template.process(null, out);
