@@ -34,11 +34,13 @@ public class ConfigService {
             while (tables.next()) {
                 TableClass tableClass = new TableClass();
                 // 表名 数据库
-                // TODO: 之后在这里处理表名
                 String table_name = tables.getString("TABLE_NAME");
                 // 表名 大小写格式处理
                 String name = CaseFormat.LOWER_UNDERSCORE
-                        .to(CaseFormat.UPPER_CAMEL, table_name);
+                        .to(CaseFormat.UPPER_CAMEL,
+                                table_name
+                                        .replace(globalConfig.getTablePrefix(), "")
+                                        .replace(globalConfig.getTableSuffix(), ""));
                 // 文件名赋值
                 tableClass.setTableName(table_name);
                 tableClass.setEntityName(name);

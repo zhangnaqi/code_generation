@@ -95,8 +95,10 @@ public class GenerateCodeService {
                             .to(CaseFormat.UPPER_CAMEL, newColumnName));
                     while (primaryKeys.next()) {
                         String pkName = primaryKeys.getString("COLUMN_NAME");
-                        if (column_name.equals(pkName)) columnClass.setIsPrimary(true);
-                        else columnClass.setIsPrimary(false);
+                        if (column_name.equals(pkName))
+                            columnClass.setIsPrimary(true);
+                        else
+                            columnClass.setIsPrimary(false);
                     }
                     primaryKeys.first();
                     columnClassList.add(columnClass);
@@ -121,6 +123,7 @@ public class GenerateCodeService {
                 // generate(voTemplate, convertObjToMap, path + "/entity/vo/");
                 // generate(dtoTemplate, convertObjToMap, path + "/entity/dto/");
             }
+            DBUtils.close();
             return Result.success("代码已生成", realPath);
         } catch (Exception e) {
             e.printStackTrace();

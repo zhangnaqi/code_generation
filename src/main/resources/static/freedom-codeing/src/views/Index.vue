@@ -44,6 +44,16 @@
             v-model="globalConfigInfo.packageName" 
             placeholder="请填写项目包名" />
         </el-form-item>
+        <el-form-item prop="packageName" label="表需要去除的前缀">
+          <el-input
+            v-model="globalConfigInfo.tablePrefix" 
+            placeholder="请填写表需要去除的前缀" />
+        </el-form-item>
+        <el-form-item prop="packageName" label="表需要去除的后缀">
+          <el-input
+            v-model="globalConfigInfo.tableSuffix" 
+            placeholder="请填写表需要去除的后缀" />
+        </el-form-item>
         <el-form-item>
           <el-button 
             type="primary" 
@@ -206,8 +216,8 @@ export default {
     })
     const globalConfigInfo = reactive({
       packageName: 'com.znq.test',
-      // tablePrefix: '',
-      // tableSuffix: '',
+      tablePrefix: '',
+      tableSuffix: '',
       // templatesType: 0
     })
     const globalConfigSubmit = () => {

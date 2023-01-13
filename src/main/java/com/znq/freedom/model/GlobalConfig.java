@@ -4,12 +4,12 @@ import lombok.Data;
 
 @Data
 public class GlobalConfig {
-    
+
     // 表需要去除的前缀
-    private String tablePrefix;
+    private String tablePrefix = "";
 
     // 表需要去除的后缀
-    private String tableSuffix;
+    private String tableSuffix = "";
 
     // 使用的模板类型
     private Integer templatesType;
