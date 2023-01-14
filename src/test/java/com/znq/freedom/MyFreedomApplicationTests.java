@@ -109,4 +109,11 @@ class MyFreedomApplicationTests {
         out.close();
     }
 
+    @Test
+    void testPackNameMkdir() {
+        String packageName = "com.znq.test";
+        String substring = packageName.substring(packageName.lastIndexOf(".") + 1);
+        System.out.println(substring);
+    }
+
 }

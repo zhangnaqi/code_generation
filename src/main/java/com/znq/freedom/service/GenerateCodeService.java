@@ -57,8 +57,8 @@ public class GenerateCodeService {
             Template serviceTemplate = cfg.getTemplate("ServiceMybatisPlus.java.ftl");
             Template serviceImplTemplate = cfg.getTemplate("ServiceImplMybatisPlus.java.ftl");
             Template controllerTemplate = cfg.getTemplate("ControllerMybatisPlus.java.ftl");
-            Template voTemplate = cfg.getTemplate("Vo.java.ftl");
-            Template dtoTemplate = cfg.getTemplate("Dto.java.ftl");
+            // Template voTemplate = cfg.getTemplate("Vo.java.ftl");
+            // Template dtoTemplate = cfg.getTemplate("Dto.java.ftl");
             // 获取数据库连接
             Connection connection = DBUtils.getConnection();
             // 获取数据库详细信息
@@ -85,10 +85,6 @@ public class GenerateCodeService {
                     columnClass.setColumnName(column_name);
                     columnClass.setType(type_name);
                     // 处理前缀和后缀
-                    if (tableClass.getColumnsPrefix() == null)
-                        tableClass.setColumnsPrefix("");
-                    if (tableClass.getColumnsSuffix() == null)
-                        tableClass.setColumnsSuffix("");
                     String newColumnName = column_name.replace(tableClass.getColumnsPrefix(), "")
                             .replace(tableClass.getColumnsSuffix(), "");
                     columnClass.setPropertyName(CaseFormat.LOWER_UNDERSCORE
@@ -104,19 +100,21 @@ public class GenerateCodeService {
                     columnClassList.add(columnClass);
                 }
                 tableClass.setColumns(columnClassList);
+                String packageName = StaticInfo.GLOBAL_CONFIG.getPackageName();
                 String path = new StringBuffer()
                         .append(realPath)
                         .append("/")
-                        .append(StaticInfo.GLOBAL_CONFIG.getPackageName()
-                                .replace(".", "/"))
+                        .append(packageName.substring(packageName.lastIndexOf(".") + 1))
+                        // .append(StaticInfo.GLOBAL_CONFIG.getPackageName()
+                        // .replace(".", "/"))
                         .toString();
                 // 数据
                 Map<String, Object> convertObjToMap = ObjMapUtils.convertObjToMap(tableClass);
-                convertObjToMap.put("packageName", StaticInfo.GLOBAL_CONFIG.getPackageName());
+                convertObjToMap.put("packageName", packageName);
                 // 根据模板生成文件
                 generate(entityTemplate, convertObjToMap, path + "/entity/");
                 generate(mapperJavaTemplate, convertObjToMap, path + "/mapper/");
-                generate(mapperXmlTemplate, convertObjToMap, path + "/mapper/mapper");
+                generate(mapperXmlTemplate, convertObjToMap, path + "/mapperXml/");
                 generate(serviceImplTemplate, convertObjToMap, path + "/service/impl/");
                 generate(serviceTemplate, convertObjToMap, path + "/service/");
                 generate(controllerTemplate, convertObjToMap, path + "/controller/");
