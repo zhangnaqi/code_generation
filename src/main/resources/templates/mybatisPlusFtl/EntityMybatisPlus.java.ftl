@@ -17,8 +17,12 @@ public class ${entityName} implements Serializable {
     /**
     * ${column.remark}
     */
-    <#if column.isPrimary??>
+    <#if column.columnName == pk.pkName>
+    <#if pk.PKAuto>
     @TableId(value = "${column.columnName}", type = IdType.AUTO)
+    <#else>
+    @TableId(value = "${column.columnName}")
+    </#if>
     <#else>
     @TableField(value = "${column.columnName}")
     </#if>
@@ -28,8 +32,12 @@ public class ${entityName} implements Serializable {
     /**
     * ${column.remark}
     */
-    <#if column.isPrimary??>
+    <#if column.columnName == pk.pkName>
+    <#if pk.PKAuto>
     @TableId(value = "${column.columnName}", type = IdType.AUTO)
+    <#else>
+    @TableId(value = "${column.columnName}")
+    </#if>
     <#else>
     @TableField(value = "${column.columnName}")
     </#if>
@@ -39,8 +47,12 @@ public class ${entityName} implements Serializable {
     /**
     * ${column.remark}
     */
-    <#if column.isPrimary??>
+    <#if column.columnName == pk.pkName>
+    <#if pk.PKAuto>
     @TableId(value = "${column.columnName}", type = IdType.AUTO)
+    <#else>
+    @TableId(value = "${column.columnName}")
+    </#if>
     <#else>
     @TableField(value = "${column.columnName}")
     </#if>
@@ -50,8 +62,12 @@ public class ${entityName} implements Serializable {
     /**
     * ${column.remark}
     */
-    <#if column.isPrimary??>
+    <#if column.columnName == pk.pkName>
+    <#if pk.PKAuto>
     @TableId(value = "${column.columnName}", type = IdType.AUTO)
+    <#else>
+    @TableId(value = "${column.columnName}")
+    </#if>
     <#else>
     @TableField(value = "${column.columnName}")
     </#if>
@@ -61,8 +77,12 @@ public class ${entityName} implements Serializable {
     /**
     * ${column.remark}
     */
-    <#if column.isPrimary??>
+    <#if column.columnName == pk.pkName>
+    <#if pk.PKAuto>
     @TableId(value = "${column.columnName}", type = IdType.AUTO)
+    <#else>
+    @TableId(value = "${column.columnName}")
+    </#if>
     <#else>
     @TableField(value = "${column.columnName}")
     </#if>
@@ -72,8 +92,12 @@ public class ${entityName} implements Serializable {
     /**
     * ${column.remark}
     */
-    <#if column.isPrimary ??>
+    <#if column.columnName == pk.pkName>
+    <#if pk.PKAuto>
     @TableId(value = "${column.columnName}", type = IdType.AUTO)
+    <#else>
+    @TableId(value = "${column.columnName}")
+    </#if>
     <#else>
     @TableField(value = "${column.columnName}")
     </#if>

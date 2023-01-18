@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +17,10 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.CaseFormat;
 import com.znq.freedom.model.ColumnClass;
+import com.znq.freedom.model.PrimaryKey;
 import com.znq.freedom.model.StaticInfo;
 import com.znq.freedom.model.TableClass;
+import com.znq.freedom.model.TemplatesType;
 import com.znq.freedom.utils.DBUtils;
 import com.znq.freedom.utils.ObjMapUtils;
 import com.znq.freedom.utils.Result;
@@ -33,8 +37,6 @@ import freemarker.template.TemplateException;
 @Service
 public class GenerateCodeService {
 
-    Configuration cfg = null;
-
     /**
      * 生成模板
      * 
@@ -42,23 +44,38 @@ public class GenerateCodeService {
      * @param realPath       相对路径
      * @return
      */
-    public Result generateCode(List<TableClass> tableClassList, String realPath) {
+    public Result<?> generateCode(List<TableClass> tableClassList, String realPath) {
+        Configuration cfg = null;
+        Template entityTemplate = null;
+        Template mapperJavaTemplate = null;
+        Template mapperXmlTemplate = null;
+        Template serviceTemplate = null;
+        Template serviceImplTemplate = null;
+        Template controllerTemplate = null;
         try {
-
             cfg = new Configuration(Configuration.VERSION_2_3_30);
-            cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class,
-                    "/templates/mybatisPlusFtl"));
+            if (StaticInfo.GLOBAL_CONFIG.getTemplatesType().equals(TemplatesType.MYBATIS.getType())) {
+                cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class,
+                        "/templates/mybatisFtl"));
+                // 获取模板
+                entityTemplate = cfg.getTemplate("Entity.java.ftl");
+                mapperJavaTemplate = cfg.getTemplate("Mapper.java.ftl");
+                mapperXmlTemplate = cfg.getTemplate("Mapper.xml.ftl");
+                serviceTemplate = cfg.getTemplate("Service.java.ftl");
+                serviceImplTemplate = cfg.getTemplate("ServiceImpl.java.ftl");
+                controllerTemplate = cfg.getTemplate("Controller.java.ftl");
+            } else if (StaticInfo.GLOBAL_CONFIG.getTemplatesType().equals(TemplatesType.MYBATISPLUS.getType())) {
+                cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class,
+                        "/templates/mybatisPlusFtl"));
+                // 获取模板
+                entityTemplate = cfg.getTemplate("EntityMybatisPlus.java.ftl");
+                mapperJavaTemplate = cfg.getTemplate("MapperMybatisPlus.java.ftl");
+                mapperXmlTemplate = cfg.getTemplate("MapperMybatisPlus.xml.ftl");
+                serviceTemplate = cfg.getTemplate("ServiceMybatisPlus.java.ftl");
+                serviceImplTemplate = cfg.getTemplate("ServiceImplMybatisPlus.java.ftl");
+                controllerTemplate = cfg.getTemplate("ControllerMybatisPlus.java.ftl");
+            }
             cfg.setDefaultEncoding("UTF-8");
-
-            // 获取模板
-            Template entityTemplate = cfg.getTemplate("EntityMybatisPlus.java.ftl");
-            Template mapperJavaTemplate = cfg.getTemplate("MapperMybatisPlus.java.ftl");
-            Template mapperXmlTemplate = cfg.getTemplate("MapperMybatisPlus.xml.ftl");
-            Template serviceTemplate = cfg.getTemplate("ServiceMybatisPlus.java.ftl");
-            Template serviceImplTemplate = cfg.getTemplate("ServiceImplMybatisPlus.java.ftl");
-            Template controllerTemplate = cfg.getTemplate("ControllerMybatisPlus.java.ftl");
-            // Template voTemplate = cfg.getTemplate("Vo.java.ftl");
-            // Template dtoTemplate = cfg.getTemplate("Dto.java.ftl");
             // 获取数据库连接
             Connection connection = DBUtils.getConnection();
             // 获取数据库详细信息
@@ -70,6 +87,27 @@ public class GenerateCodeService {
                 // 根据表名获取表中的主键
                 ResultSet primaryKeys = metaData.getPrimaryKeys(connection.getCatalog(), null,
                         tableClass.getTableName());
+                // 主键
+                PrimaryKey pk = new PrimaryKey();
+                while (primaryKeys.next()) {
+                    pk.setPkName(primaryKeys.getString("COLUMN_NAME"));
+                    // 主键是否递增
+                    String sql = "select " + pk.getPkName() + " from " + tableClass.getTableName();
+                    PreparedStatement prepareStatement = connection.prepareStatement(sql);
+                    ResultSet res = prepareStatement.executeQuery();
+                    ResultSetMetaData metaData1 = res.getMetaData();
+                    if (metaData1.isAutoIncrement(1)) {
+                        // System.out.println("自动递增id");
+                        pk.setPKAuto(true);
+                    }
+                    // 主键在bean类中的存储
+                    String newColumnName = pk.getPkName().replace(tableClass.getColumnsPrefix(), "")
+                            .replace(tableClass.getColumnsSuffix(), "");
+                    pk.setPkPropertyName(CaseFormat.LOWER_UNDERSCORE
+                            .to(CaseFormat.UPPER_CAMEL, newColumnName));
+                }
+                primaryKeys.first();
+                tableClass.setPk(pk);
                 List<ColumnClass> columnClassList = new ArrayList<>();
                 // 循环表中的字段
                 while (columns.next()) {
@@ -79,6 +117,10 @@ public class GenerateCodeService {
                     String type_name = columns.getString("TYPE_NAME");
                     // 备注
                     String remarks = columns.getString("REMARKS");
+                    // 主键类型添加
+                    if (pk.getPkName().equals(column_name)) {
+                        pk.setPkType(type_name);
+                    }
                     // 将获取到的数据存储起来
                     ColumnClass columnClass = new ColumnClass();
                     columnClass.setRemark(remarks);
@@ -89,14 +131,6 @@ public class GenerateCodeService {
                             .replace(tableClass.getColumnsSuffix(), "");
                     columnClass.setPropertyName(CaseFormat.LOWER_UNDERSCORE
                             .to(CaseFormat.UPPER_CAMEL, newColumnName));
-                    while (primaryKeys.next()) {
-                        String pkName = primaryKeys.getString("COLUMN_NAME");
-                        if (column_name.equals(pkName))
-                            columnClass.setIsPrimary(true);
-                        else
-                            columnClass.setIsPrimary(false);
-                    }
-                    primaryKeys.first();
                     columnClassList.add(columnClass);
                 }
                 tableClass.setColumns(columnClassList);

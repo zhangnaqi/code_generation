@@ -12,7 +12,7 @@ public class GlobalConfig {
     private String tableSuffix = "";
 
     // 使用的模板类型
-    private Integer templatesType;
+    private String templatesType;
 
     // 生成项目的包路径
     private String packageName;

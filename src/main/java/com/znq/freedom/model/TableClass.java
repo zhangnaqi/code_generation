@@ -20,5 +20,5 @@ public class TableClass {
     private String mapperName;
     private String controllerName;
     private List<ColumnClass> columns; // 字段
-
+    private PrimaryKey pk;
 }

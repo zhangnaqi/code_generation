@@ -45,9 +45,9 @@ public class dbTest {
 
                 System.out.println("Table name:" + rs.getString("TABLE_NAME"));
                 System.out.println("Column name:" + rs.getString("COLUMN_NAME"));
-                // System.out.println("Catalog name:" + rs.getString("TABLE_CAT"));
-                // System.out.println("Primary key sequence:" + rs.getString("KEY_SEQ"));
-                // System.out.println("Primary key name:" + rs.getString("PK_NAME"));
+                System.out.println("Catalog name:" + rs.getString("TABLE_CAT"));
+                System.out.println("Primary key sequence:" + rs.getString("KEY_SEQ"));
+                System.out.println("Primary key name:" + rs.getString("PK_NAME"));
                 System.out.println("");
             }
         } catch (Exception e) {

@@ -22,5 +22,29 @@ public class ${controllerName}{
     @Resource
     private ${serviceName} ${serviceName?uncap_first};
 
-    
+    @ApiOperation("添加")
+    @PostMapping("/insert")
+    public Result<?> insert(@RequestBody ${entityName} ${entityName?uncap_first}) {
+        return ${serviceName?uncap_first}.insert(${entityName?uncap_first});
+    }
+
+    @ApiOperation("修改")
+    @PostMapping("/update")
+    public Result<?> update(@RequestBody ${entityName} ${entityName?uncap_first}) {
+        return ${serviceName?uncap_first}.updateByPrimaryKey(${entityName?uncap_first});
+    }
+
+    @ApiOperation("删除")
+    @GetMapping("/delete/{id}")
+    public Result<?> delete(@PathVariable Integer id) {
+        return ${serviceName?uncap_first}.deleteByPrimaryKey(id);
+    }
+
+    @ApiOperation("根据id查询")
+    @GetMapping("/selectOne/{id}")
+    public Result<?> selectOne(@PathVariable Integer id) {
+        return ${serviceName?uncap_first}.selectByPrimaryKey(id);
+    }
+
+
 }

@@ -44,6 +44,16 @@
             v-model="globalConfigInfo.packageName" 
             placeholder="请填写项目包名" />
         </el-form-item>
+        <el-form-item prop="templatesType" label="选择生成项目类别" required>
+            <el-select v-model="globalConfigInfo.templatesType" placeholder="选择生成项目类别">
+              <el-option
+                v-for="item in templateTypeList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+             </el-select>
+        </el-form-item>
         <el-form-item prop="packageName" label="表需要去除的前缀">
           <el-input
             v-model="globalConfigInfo.tablePrefix" 
@@ -218,7 +228,7 @@ export default {
       packageName: 'com.znq.test',
       tablePrefix: '',
       tableSuffix: '',
-      // templatesType: 0
+      templatesType: ''
     })
     const globalConfigSubmit = () => {
       if (!globalConfigFormRef.value) return
@@ -289,6 +299,17 @@ export default {
         }
       })
     }
+    // 项目生成类别模板选择
+    const templateTypeList = [
+      {
+        value: 'mybatis',
+        lable: 'mybatis'
+      },
+      {
+        value: 'mybatis-plus',
+        lable: 'mybatis-plus'
+      }
+    ]
     return {
       dbInfo,
       dbFormRef,
@@ -304,7 +325,8 @@ export default {
       generateCodeFormRef,
       generateCodeFormRule,
       generateCodeInfo,
-      generateCodeSubmit
+      generateCodeSubmit,
+      templateTypeList
     }
   }
 }
