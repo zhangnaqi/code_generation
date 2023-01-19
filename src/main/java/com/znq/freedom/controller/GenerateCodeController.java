@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.znq.freedom.model.TableClass;
@@ -38,6 +39,14 @@ public class GenerateCodeController {
     public Result<?> generateCode(@RequestBody List<TableClass> tableClassList, @PathVariable String path) {
         log.info("/template/generateCode/{path} ===> tableClassList: {}, path: {}", tableClassList, path);
         return generateCodeService.generateCode(tableClassList, path.replace('-', '\\'));
+    }
+
+    // 对单独的表进行预览
+    @ApiOperation("根据表名对当前表生成代码进行预览")
+    @PostMapping("/preview")
+    public Result<?> previewCode(@RequestParam("tableName") String tableName) {
+        log.info("/template/preview ===> {}", tableName);
+        return generateCodeService.previewCode(tableName);
     }
 
 }

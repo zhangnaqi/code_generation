@@ -302,12 +302,12 @@ export default {
     // 项目生成类别模板选择
     const templateTypeList = [
       {
-        value: 'mybatis',
-        lable: 'mybatis'
+        value: 'MYBATIS',
+        label: 'mybatis'
       },
       {
-        value: 'mybatis-plus',
-        lable: 'mybatis-plus'
+        value: 'MYBATISPLUS',
+        label: 'mybatis-plus'
       }
     ]
     return {

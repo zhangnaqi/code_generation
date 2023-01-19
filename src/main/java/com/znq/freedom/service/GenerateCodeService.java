@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -20,13 +21,12 @@ import com.znq.freedom.model.ColumnClass;
 import com.znq.freedom.model.PrimaryKey;
 import com.znq.freedom.model.StaticInfo;
 import com.znq.freedom.model.TableClass;
+import com.znq.freedom.model.TemplateConfig;
 import com.znq.freedom.model.TemplatesType;
 import com.znq.freedom.utils.DBUtils;
 import com.znq.freedom.utils.ObjMapUtils;
 import com.znq.freedom.utils.Result;
 
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -45,37 +45,10 @@ public class GenerateCodeService {
      * @return
      */
     public Result<?> generateCode(List<TableClass> tableClassList, String realPath) {
-        Configuration cfg = null;
-        Template entityTemplate = null;
-        Template mapperJavaTemplate = null;
-        Template mapperXmlTemplate = null;
-        Template serviceTemplate = null;
-        Template serviceImplTemplate = null;
-        Template controllerTemplate = null;
+        TemplateConfig tc = null;
         try {
-            cfg = new Configuration(Configuration.VERSION_2_3_30);
-            if (StaticInfo.GLOBAL_CONFIG.getTemplatesType().equals(TemplatesType.MYBATIS.getType())) {
-                cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class,
-                        "/templates/mybatisFtl"));
-                // 获取模板
-                entityTemplate = cfg.getTemplate("Entity.java.ftl");
-                mapperJavaTemplate = cfg.getTemplate("Mapper.java.ftl");
-                mapperXmlTemplate = cfg.getTemplate("Mapper.xml.ftl");
-                serviceTemplate = cfg.getTemplate("Service.java.ftl");
-                serviceImplTemplate = cfg.getTemplate("ServiceImpl.java.ftl");
-                controllerTemplate = cfg.getTemplate("Controller.java.ftl");
-            } else if (StaticInfo.GLOBAL_CONFIG.getTemplatesType().equals(TemplatesType.MYBATISPLUS.getType())) {
-                cfg.setTemplateLoader(new ClassTemplateLoader(GenerateCodeService.class,
-                        "/templates/mybatisPlusFtl"));
-                // 获取模板
-                entityTemplate = cfg.getTemplate("EntityMybatisPlus.java.ftl");
-                mapperJavaTemplate = cfg.getTemplate("MapperMybatisPlus.java.ftl");
-                mapperXmlTemplate = cfg.getTemplate("MapperMybatisPlus.xml.ftl");
-                serviceTemplate = cfg.getTemplate("ServiceMybatisPlus.java.ftl");
-                serviceImplTemplate = cfg.getTemplate("ServiceImplMybatisPlus.java.ftl");
-                controllerTemplate = cfg.getTemplate("ControllerMybatisPlus.java.ftl");
-            }
-            cfg.setDefaultEncoding("UTF-8");
+            // 配置模板
+            tc = TemplatesType.valueOf(StaticInfo.GLOBAL_CONFIG.getTemplatesType()).template();
             // 获取数据库连接
             Connection connection = DBUtils.getConnection();
             // 获取数据库详细信息
@@ -146,12 +119,12 @@ public class GenerateCodeService {
                 Map<String, Object> convertObjToMap = ObjMapUtils.convertObjToMap(tableClass);
                 convertObjToMap.put("packageName", packageName);
                 // 根据模板生成文件
-                generate(entityTemplate, convertObjToMap, path + "/entity/");
-                generate(mapperJavaTemplate, convertObjToMap, path + "/mapper/");
-                generate(mapperXmlTemplate, convertObjToMap, path + "/mapperXml/");
-                generate(serviceImplTemplate, convertObjToMap, path + "/service/impl/");
-                generate(serviceTemplate, convertObjToMap, path + "/service/");
-                generate(controllerTemplate, convertObjToMap, path + "/controller/");
+                generate(tc.getEntityTemplate(), convertObjToMap, path + "/entity/");
+                generate(tc.getMapperJavaTemplate(), convertObjToMap, path + "/mapper/");
+                generate(tc.getMapperXmlTemplate(), convertObjToMap, path + "/mapperXml/");
+                generate(tc.getServiceTemplate(), convertObjToMap, path + "/service/impl/");
+                generate(tc.getServiceImplTemplate(), convertObjToMap, path + "/service/");
+                generate(tc.getControllerTemplate(), convertObjToMap, path + "/controller/");
             }
             DBUtils.close();
             return Result.success("代码已生成", realPath);
@@ -159,6 +132,10 @@ public class GenerateCodeService {
             e.printStackTrace();
             throw new RuntimeException("代码生成失败");
         }
+    }
+
+    public Result<?> previewCode(String tableName) {
+        return null;
     }
 
     // 输出最终代码 生成文件
@@ -178,6 +155,14 @@ public class GenerateCodeService {
         template.process(map, out);
         fos.close();
         out.close();
+    }
+
+    // 输出最终代码，字符串形式返回
+    private String preview(Template template, Map<String, Object> map)
+            throws TemplateException, IOException {
+        StringWriter stringWriter = new StringWriter();
+        template.process(map, stringWriter);
+        return stringWriter.toString();
     }
 
 }

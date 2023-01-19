@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -73,7 +74,6 @@ class MyFreedomApplicationTests {
                             new File(
                                     "D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/")));
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         cfg.setDefaultEncoding("UTF-8");
@@ -81,19 +81,14 @@ class MyFreedomApplicationTests {
             Template template = cfg.getTemplate("test1.java.ftl");
             this.generate(template);
         } catch (TemplateNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (MalformedTemplateNameException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (TemplateException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -114,6 +109,45 @@ class MyFreedomApplicationTests {
         String packageName = "com.znq.test";
         String substring = packageName.substring(packageName.lastIndexOf(".") + 1);
         System.out.println(substring);
+    }
+
+    @Test
+    void testPreview() {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
+        try {
+            cfg.setTemplateLoader(
+                    new FileTemplateLoader(
+                            new File(
+                                    "D:/allproject/base/my_freedom/src/test/java/com/znq/freedom/testFtl/")));
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        cfg.setDefaultEncoding("UTF-8");
+        try {
+            Template template = cfg.getTemplate("test1.java.ftl");
+            this.preview(template);
+        } catch (TemplateNotFoundException e) {
+            e.printStackTrace();
+        } catch (MalformedTemplateNameException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void preview(Template template) {
+        StringWriter stringWriter = new StringWriter();
+        try {
+            template.process(template, stringWriter);
+            stringWriter.close();
+        } catch (TemplateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(stringWriter);
     }
 
 }
