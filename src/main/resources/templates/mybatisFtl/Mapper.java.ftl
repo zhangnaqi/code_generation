@@ -9,9 +9,11 @@ public interface ${mapperName} {
     
     int deleteByPrimaryKey(Integer id);
 
-    int insert(News record);
+    int insert(${entityName} record);
 
-    News selectByPrimaryKey(Integer id);
+    ${entityName} selectByPrimaryKey(Integer id);
 
-    int updateByPrimaryKey(News record);
+    int updateByPrimaryKey(${entityName} record);
+
+    List<${entityName}> selectAll();
 }

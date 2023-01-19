@@ -11,7 +11,11 @@ public interface ${serviceName} {
 
     Result<?> insert(${entityName} record);
 
+    Result<?> updateByPrimaryKey(${entityName} record);
+    
     Result<?> selectByPrimaryKey(Integer id);
 
-    Result<?> updateByPrimaryKey(${entityName} record);
+    Result<?> selectAll();
+
+    Result<?> selectAllPage(Integer currentPage, Integer size);
 }

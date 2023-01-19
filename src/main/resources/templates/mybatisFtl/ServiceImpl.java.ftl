@@ -4,6 +4,8 @@ import ${packageName}.entity.${entityName};
 import ${packageName}.mapper.${mapperName};
 import ${packageName}.service.${serviceName};
 import ${packageName}.utils.Result;
+import ${packageName}.utils.MyPageInfoUtil;
+import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,6 +27,11 @@ public class ${serviceName}Impl implements ${serviceName} {
         return ${mapperName?uncap_first}.insert(record)
                 > 0 ? Result.SUCCESS() : Result.FAIL();
     }
+    @Override
+    public Result<?> updateByPrimaryKey(${entityName} record) {
+        return ${mapperName?uncap_first}.updateByPrimaryKey(record)
+                > 0 ? Result.SUCCESS() : Result.FAIL();
+    }
 
     @Override
     public Result<?> selectByPrimaryKey(Integer id) {
@@ -32,9 +39,14 @@ public class ${serviceName}Impl implements ${serviceName} {
     }
 
     @Override
-    public Result<?> updateByPrimaryKey(${entityName} record) {
-        return ${mapperName?uncap_first}.updateByPrimaryKey(record)
-                > 0 ? Result.SUCCESS() : Result.FAIL();
+    public Result<?> selectAll() {
+        return Result.SUCCESS(${mapperName?uncap_first}.selectAll());
+    }
+    
+    @Override
+    public Result<?> selectAllPage(Integer currentPage, Integer size) {
+        PageHelper.startPage(currentPage, size);
+        return Result.SUCCESS(MyPageInfoUtil.getPageInfoDetail(${mapperName?uncap_first}.selectAll()));
     }
 
 }

@@ -3,7 +3,6 @@ package ${packageName}.controller;
 import ${packageName}.entity.${entityName};
 import ${packageName}.service.${serviceName};
 import javax.annotation.Resource;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import io.swagger.annotations.Api;
@@ -29,21 +28,34 @@ public class ${controllerName}{
     }
 
     @ApiOperation("修改")
-    @PostMapping("/update")
-    public Result<?> update(@RequestBody ${entityName} ${entityName?uncap_first}) {
+    @PostMapping("/updateByPrimaryKey")
+    public Result<?> updateByPrimaryKey(@RequestBody ${entityName} ${entityName?uncap_first}) {
         return ${serviceName?uncap_first}.updateByPrimaryKey(${entityName?uncap_first});
     }
 
     @ApiOperation("删除")
-    @GetMapping("/delete/{id}")
-    public Result<?> delete(@PathVariable Integer id) {
+    @GetMapping("/deleteByPrimaryKey/{id}")
+    public Result<?> deleteByPrimaryKey(@PathVariable Integer id) {
         return ${serviceName?uncap_first}.deleteByPrimaryKey(id);
     }
 
     @ApiOperation("根据id查询")
-    @GetMapping("/selectOne/{id}")
-    public Result<?> selectOne(@PathVariable Integer id) {
+    @GetMapping("/selectByPrimaryKey/{id}")
+    public Result<?> selectByPrimaryKey(@PathVariable Integer id) {
         return ${serviceName?uncap_first}.selectByPrimaryKey(id);
+    }
+
+    @ApiOperation("查询全部")
+    @GetMapping("/selectAll")
+    public Result<?> selectAll() {
+        return ${serviceName?uncap_first}.selectAll();
+    }
+
+    @ApiOperation("查询全部 分页")
+    @GetMapping("/selectAllPage/{currentPage}/{size}")
+    public Result<?> selectAllPage(@PathVariable Integer currentPage,
+                                @PathVariable Integer size) {
+        return ${serviceName?uncap_first}.selectAllPage(currentPage, size);
     }
 
 
