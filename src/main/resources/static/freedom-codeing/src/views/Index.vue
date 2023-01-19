@@ -287,7 +287,7 @@ export default {
         if(valid) {
           const path = generateCodeInfo.path.replace(/\\/g, '-')
           request.post(
-            `/generateCode/${path}`, 
+            `/template/generateCode/${path}`, 
             dbTable.dbTableReturn
           ).then(res => {
             console.log("自动文件生成成功");

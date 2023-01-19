@@ -152,8 +152,6 @@ public class GenerateCodeService {
                 generate(serviceImplTemplate, convertObjToMap, path + "/service/impl/");
                 generate(serviceTemplate, convertObjToMap, path + "/service/");
                 generate(controllerTemplate, convertObjToMap, path + "/controller/");
-                // generate(voTemplate, convertObjToMap, path + "/entity/vo/");
-                // generate(dtoTemplate, convertObjToMap, path + "/entity/dto/");
             }
             DBUtils.close();
             return Result.success("代码已生成", realPath);
