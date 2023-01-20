@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -20,7 +19,6 @@ import com.znq.freedom.service.ConfigService;
 import com.znq.freedom.service.GenerateCodeService;
 import com.znq.freedom.utils.Result;
 
-import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;

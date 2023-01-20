@@ -2,8 +2,6 @@ package com.znq.freedom.model;
 
 import java.io.IOException;
 
-import com.znq.freedom.service.TemplateOperation;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;

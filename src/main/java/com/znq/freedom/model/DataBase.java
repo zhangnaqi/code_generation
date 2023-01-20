@@ -1,6 +1,5 @@
 package com.znq.freedom.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
