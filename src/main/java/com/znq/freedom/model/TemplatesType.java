@@ -20,7 +20,9 @@ public enum TemplatesType implements TemplateOperation {
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
             cfg.setTemplateLoader(new ClassTemplateLoader(TemplatesType.class,
                     "/templates/mybatisFtl"));
+            cfg.setDefaultEncoding("UTF-8");
             TemplateConfig tc = new TemplateConfig();
+            tc.setCfg(cfg);
             // 获取模板
             try {
                 tc.setEntityTemplate(cfg.getTemplate("Entity.java.ftl"));
@@ -29,8 +31,6 @@ public enum TemplatesType implements TemplateOperation {
                 tc.setServiceTemplate(cfg.getTemplate("Service.java.ftl"));
                 tc.setServiceImplTemplate(cfg.getTemplate("ServiceImpl.java.ftl"));
                 tc.setControllerTemplate(cfg.getTemplate("Controller.java.ftl"));
-                cfg.setDefaultEncoding("UTF-8");
-                tc.setCfg(cfg);
             } catch (TemplateNotFoundException e) {
                 log.info("TemplatesType mybatis 模板未找到异常 =====》");
                 e.printStackTrace();
@@ -58,7 +58,9 @@ public enum TemplatesType implements TemplateOperation {
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
             cfg.setTemplateLoader(new ClassTemplateLoader(TemplatesType.class,
                     "/templates/mybatisPlusFtl"));
+            cfg.setDefaultEncoding("UTF-8");
             TemplateConfig tc = new TemplateConfig();
+            tc.setCfg(cfg);
             // 获取模板
             try {
                 tc.setEntityTemplate(cfg.getTemplate("EntityMybatisPlus.java.ftl"));
@@ -67,8 +69,6 @@ public enum TemplatesType implements TemplateOperation {
                 tc.setServiceTemplate(cfg.getTemplate("ServiceMybatisPlus.java.ftl"));
                 tc.setServiceImplTemplate(cfg.getTemplate("ServiceImplMybatisPlus.java.ftl"));
                 tc.setControllerTemplate(cfg.getTemplate("ControllerMybatisPlus.java.ftl"));
-                cfg.setDefaultEncoding("UTF-8");
-                tc.setCfg(cfg);
             } catch (TemplateNotFoundException e) {
                 log.info("TemplatesType mybatis 模板未找到异常 =====》");
                 e.printStackTrace();

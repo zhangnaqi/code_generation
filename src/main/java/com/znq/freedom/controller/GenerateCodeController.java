@@ -44,9 +44,9 @@ public class GenerateCodeController {
     // 对单独的表进行预览
     @ApiOperation("根据表名对当前表生成代码进行预览")
     @PostMapping("/preview")
-    public Result<?> previewCode(@RequestParam("tableName") String tableName) {
-        log.info("/template/preview ===> {}", tableName);
-        return generateCodeService.previewCode(tableName);
+    public Result<?> previewCode(@RequestBody TableClass tableClass) {
+        log.info("/template/preview ===> {}", tableClass);
+        return generateCodeService.previewCode(tableClass);
     }
 
 }

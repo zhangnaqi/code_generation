@@ -141,7 +141,65 @@
               placeholder="请输入服务层页面名" />
           </template>
         </el-table-column>
+        <el-table-column fixed="right" label="Operations" width="120">
+          <template #default="scope">
+            <el-button 
+              link 
+              type="primary" 
+              size="small" 
+              @click="handlePreviewCode(scope.row)"
+            >预览</el-button>
+          </template>
+        </el-table-column>
       </el-table>
+      <el-dialog 
+        v-model="tablePreviewCodeDialog" 
+        title="代码预览"
+        @close="tablePreviewCodeDialogHandleClose"
+      >
+        <el-tabs 
+          v-model="tablePreviewCodeTab" 
+          class="demo-tabs" 
+          @tab-click="handleClick"
+        >
+          <el-tab-pane 
+            label="entity" 
+            name="entity" 
+            v-html="tablePreviewCode.entityTemplate"
+            :style="{ 'height': '500px', 'overflow': 'auto' }"
+          ></el-tab-pane>
+          <el-tab-pane 
+            label="controller" 
+            name="controller" 
+            v-html="tablePreviewCode.controllerTemplate"
+            :style="{ 'height': '500px', 'overflow': 'auto' }"
+            ></el-tab-pane>
+          <el-tab-pane 
+            label="service" 
+            name="service" 
+            v-html="tablePreviewCode.serviceTemplate"
+            :style="{ 'height': '500px', 'overflow': 'auto' }"
+            ></el-tab-pane>
+          <el-tab-pane 
+            label="serviceImpl" 
+            name="serviceImpl" 
+            v-html="tablePreviewCode.serviceImplTemplate"
+            :style="{ 'height': '500px', 'overflow': 'auto' }"
+            ></el-tab-pane>
+          <el-tab-pane 
+            label="mapper" 
+            name="mapper" 
+            v-html="tablePreviewCode.mapperJavaTemplate"
+            :style="{ 'height': '500px', 'overflow': 'auto' }"
+            ></el-tab-pane>
+          <el-tab-pane 
+            label="mapperXML" 
+            name="mapperXML" 
+            v-html="tablePreviewCode.mapperXmlTemplate"
+            :style="{ 'height': '500px', 'overflow': 'auto' }"
+            ></el-tab-pane>
+        </el-tabs>
+      </el-dialog>
     </div>
     <div>
       <h1>路径配置与文件生成</h1>
@@ -213,6 +271,26 @@ export default {
       dbTableInfo: [],
       dbTableReturn: []
     })
+    // 预览
+    const tablePreviewCodeDialog = ref(false)
+    const tablePreviewCodeTab = ref('entity')
+    const tablePreviewCode = ref({})
+    const handlePreviewCode = (row) => {
+      // 对单独的表进行预览
+      request.post('/template/preview', row).then(res => {
+        console.log("对单独的表进行预览", res);
+        tablePreviewCode.value = res.data
+        // 弹出弹窗显示代码
+        tablePreviewCodeDialog.value = true
+
+      })
+    }
+    // 关闭预览弹出框
+    const tablePreviewCodeDialogHandleClose = () => {
+      tablePreviewCodeDialog.value = false
+      tablePreviewCode.value = {}
+    }
+    // 选择要生成代码的表
     const handleSelectionDBTableChange = (val) => {
       console.log("选择", val);
       dbTable.dbTableReturn = val
@@ -261,11 +339,15 @@ export default {
       // 关闭数据库，清空表单
       request.post('/db/close').then(res => {
         console.log("关闭数据库，清空表单", res);
+        dbTable.dbTableInfo = []
+        dbTable.dbTableReturn  = []
         dbFormRef.value.resetFields()
         globalConfigFormRef.value.resetFields()
       }).catch(e => {
         console.log("关闭数据库,清空表单失败", e);
         if (e.message === "未有数据库连接") {
+          dbTable.dbTableInfo = []
+          dbTable.dbTableReturn  = []
           dbFormRef.value.resetFields()
           globalConfigFormRef.value.resetFields()
         } else ElMessage.error("重置配置失败")
@@ -316,6 +398,11 @@ export default {
       dbFormRule,
       dbSubmit,
       ...toRefs(dbTable),
+      tablePreviewCodeDialog,
+      tablePreviewCodeTab,
+      tablePreviewCode,
+      tablePreviewCodeDialogHandleClose,
+      handlePreviewCode,
       handleSelectionDBTableChange,
       globalConfigInfo,
       globalConfigFormRef,
