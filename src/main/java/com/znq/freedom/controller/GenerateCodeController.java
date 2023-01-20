@@ -37,7 +37,7 @@ public class GenerateCodeController {
     @PostMapping("/generateCode/{path}")
     public Result<?> generateCode(@RequestBody List<TableClass> tableClassList, @PathVariable String path) {
         log.info("/template/generateCode/{path} ===> tableClassList: {}, path: {}", tableClassList, path);
-        return generateCodeService.generateCode(tableClassList, path.replace('-', '\\'));
+        return generateCodeService.generateCode(tableClassList, path.replace('-', '/'));
     }
 
     // 对单独的表进行预览

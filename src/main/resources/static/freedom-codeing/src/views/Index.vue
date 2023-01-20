@@ -324,9 +324,10 @@ export default {
               console.log("获取数据库详细信息", res.data);
               dbTable.dbTableInfo = res.data
               dbTable.dbTableReturn = res.data
-              // ElMessage.success("连接成功！")
+              ElMessage.success("获取数据库详细信息成功！")
             }).catch(e => {
-              ElMessage.error("获取数据库详细信息失败", e)
+              console.log("获取数据库详细信息", e);
+              ElMessage.error("获取数据库详细信息失败")
             })
           } else {
             console.log('error submit!')
@@ -373,10 +374,12 @@ export default {
             dbTable.dbTableReturn
           ).then(res => {
             console.log("自动文件生成成功");
-            ElMessage.success("生成成功")
+            ElMessage.success(`生成成功，地址：${res.data}`)
           }).catch(e => {
             console.log("自动文件生成失败");
             ElMessage.error('生成失败')
+          }).finally(() => {
+            globalConfigReset()
           })
         }
       })

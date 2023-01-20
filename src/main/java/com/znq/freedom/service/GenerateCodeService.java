@@ -57,19 +57,17 @@ public class GenerateCodeService {
             Connection connection = DBUtils.getConnection();
             // 获取数据库详细信息
             DatabaseMetaData metaData = connection.getMetaData();
+            // 路径包名
+            String packageName = StaticInfo.GLOBAL_CONFIG.getPackageName();
+            String path = new StringBuffer()
+                    .append(realPath)
+                    .append("/")
+                    .append(packageName.substring(packageName.lastIndexOf(".") + 1))
+                    .toString();
             // 遍历前端传过来的要生成的表list
             for (TableClass tableClass : tableClassList) {
                 // 对数据库信息的处理
                 this.getDBInfo(connection, metaData, tableClass);
-                // 获取包名和存储路径
-                String packageName = StaticInfo.GLOBAL_CONFIG.getPackageName();
-                String path = new StringBuffer()
-                        .append(realPath)
-                        .append("/")
-                        .append(packageName.substring(packageName.lastIndexOf(".") + 1))
-                        // .append(StaticInfo.GLOBAL_CONFIG.getPackageName()
-                        // .replace(".", "/"))
-                        .toString();
                 // 数据
                 Map<String, Object> convertObjToMap = ObjMapUtils.convertObjToMap(tableClass);
                 convertObjToMap.put("packageName", packageName);
@@ -81,8 +79,7 @@ public class GenerateCodeService {
                 generate(tc.getServiceImplTemplate(), convertObjToMap, path + "/service/");
                 generate(tc.getControllerTemplate(), convertObjToMap, path + "/controller/");
             }
-            DBUtils.close();
-            return Result.success("代码已生成", realPath);
+            return Result.success("代码已生成", path);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("代码生成失败");
