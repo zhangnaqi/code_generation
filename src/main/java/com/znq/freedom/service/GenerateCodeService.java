@@ -105,17 +105,17 @@ public class GenerateCodeService {
             convertObjToMap.put("packageName", packageName);
             // 根据模板生成文件
             resultMap.put("entityTemplate",
-                    preview(tc.getEntityTemplate(), convertObjToMap).replaceAll("\\n|\\r", "<br>"));
+                    preview(tc.getEntityTemplate(), convertObjToMap).replaceAll("\\r\\n|\\n|\\r", "<br>"));
             resultMap.put("mapperJavaTemplate",
-                    preview(tc.getMapperJavaTemplate(), convertObjToMap).replaceAll("\\n|\\r", "<br>"));
+                    preview(tc.getMapperJavaTemplate(), convertObjToMap).replaceAll("\\r\\n|\\n|\\r", "<br>"));
             resultMap.put("mapperXmlTemplate",
-                    preview(tc.getMapperXmlTemplate(), convertObjToMap).replaceAll("\\n|\\r", "<br>"));
+                    "<xmp>" + preview(tc.getMapperXmlTemplate(), convertObjToMap) + "</xmp>");
             resultMap.put("serviceTemplate",
-                    preview(tc.getServiceTemplate(), convertObjToMap).replaceAll("\\n|\\r", "<br>"));
+                    preview(tc.getServiceTemplate(), convertObjToMap).replaceAll("\\r\\n|\\n|\\r", "<br>"));
             resultMap.put("serviceImplTemplate",
-                    preview(tc.getServiceImplTemplate(), convertObjToMap).replaceAll("\\n|\\r", "<br>"));
+                    preview(tc.getServiceImplTemplate(), convertObjToMap).replaceAll("\\r\\n|\\n|\\r", "<br>"));
             resultMap.put("controllerTemplate",
-                    preview(tc.getControllerTemplate(), convertObjToMap).replaceAll("\\n|\\r", "<br>"));
+                    preview(tc.getControllerTemplate(), convertObjToMap).replaceAll("\\r\\n|\\n|\\r", "<br>"));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("代码生成失败");

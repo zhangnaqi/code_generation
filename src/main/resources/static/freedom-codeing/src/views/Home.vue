@@ -47,7 +47,7 @@ export default {
 </style>
 <style>
 body {
-  margin: 0;
-  overflow: hidden;
+  overflow: scroll;
+  height: 100vh;
 }
 </style>
